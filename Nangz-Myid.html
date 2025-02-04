@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tiktok downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #6a00f4, #ff00c3);
+            color: white;
+            padding: 40px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(8px);
+        }
+        .input-box {
+            display: flex;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .paste-btn {
+            background: #6a00f4;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            background: #ff00c3;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .download-btn:hover {
+            background: #e000b1;
+        }
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+        .result a {
+            display: block;
+            margin-top: 10px;
+            padding: 12px;
+            font-size: 16px;
+            background: #00c3ff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .result a.hd {
+            background: #ff9900;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>download tiktok mp4/mp3</h2>
+        <div class="input-box">
+            <input type="text" id="url" placeholder="tempel tautan video di sini">
+            <button class="paste-btn" onclick="pasteURL()">tempel</button>
+        </div>
+        <button class="download-btn" onclick="startDownload()">download</button>
+
+        <div class="result" id="result">
+            <a id="mp4" href="#" target="_blank">download mp4</a>
+            <a id="mp4hd" class="hd" href="#" target="_blank">download mp4 hd</a>
+            <a id="mp3" href="#" target="_blank">download mp3</a>
+        </div>
+    </div>
+
+    <script>
+        function pasteURL() {
+            let input = document.getElementById("url");
+            navigator.clipboard.readText().then(text => {
+                if (!input.value) { 
+                    input.value = text; 
+                }
+            }).catch(err => {
+                input.focus(); 
+                document.execCommand("paste");
+            });
+        }
+
+        async function startDownload() {
+            let url = document.getElementById("url").value;
+            if (!url.includes("tiktok.com")) {
+                alert("masukkan link video tiktok yang valid!");
+                return;
+            }
+
+            document.getElementById("result").style.display = "none"; // sembunyikan dulu
+
+            let apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            let response = await fetch(apiUrl);
+            let data = await response.json();
+
+            if (data.data) {
+                document.getElementById("mp4").href = data.data.play;
+                document.getElementById("mp4hd").href = data.data.hdplay || data.data.play;
+                document.getElementById("mp3").href = data.data.music;
+                document.getElementById("result").style.display = "block"; // muncul pilihan format
+            } else {
+                alert("gagal mengambil video, coba lagi!");
+            }
+        }
+    </script>
+
+</body>
+</html>
